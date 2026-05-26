@@ -1,0 +1,30 @@
+# Build artifacts
+out/
+build/
+bin/
+*.exe
+*.obj
+*.lib
+*.pdb
+*.ilk
+*.exp
+
+# VS Code
+.vscode/
+
+# Large data and models
+*.onnx
+*.xml
+data/
+*.jpg
+*.jpeg
+*.png
+capture_*.jpg
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Editor backups
+*~
+*.bak
