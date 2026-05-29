@@ -11,6 +11,7 @@
 #define FILTER_H
 
 #include <opencv2/opencv.hpp>
+#include <vector>
 
 /* custom grayscale conversion.
   takes the max of the B and G channels and inverts it: value = 255 - max(B, G).

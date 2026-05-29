@@ -43,11 +43,18 @@ shortcuts):
 
 ## Build
 
-Requires OpenCV 4 and ONNX Runtime. Edit `CMakeLists.txt` to point at your
-install paths, then:
+Requires OpenCV 4. ONNX Runtime is only required for `vidDisplay`, which uses
+the depth and style-transfer networks.
 
 ```bash
-cmake -S . -B build
+cmake -S . -B build -DBUILD_ONNX_EFFECTS=OFF
+cmake --build build --config Release
+```
+
+To build `vidDisplay`, point CMake at an ONNX Runtime install:
+
+```bash
+cmake -S . -B build -DONNXRUNTIME_ROOT=/path/to/onnxruntime
 cmake --build build --config Release
 ```
 

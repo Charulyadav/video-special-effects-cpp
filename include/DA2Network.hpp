@@ -38,11 +38,16 @@
   modified from Prof. Maxwell's original to Windows-specific patches were applied
 */
 
+#ifndef DA2_NETWORK_HPP
+#define DA2_NETWORK_HPP
+
+#include <array>
+#include <cstdlib>
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+#include <iostream>
 #include <string>
-#include <array>
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/opencv.hpp>
 
@@ -69,6 +74,9 @@ public:
     this->session_ = new Ort::Session(env, network_path, session_options);
 #endif
   }
+
+  DA2Network(const DA2Network &) = delete;
+  DA2Network &operator=(const DA2Network &) = delete;
 
   // constructor with both the network path and the layer names
   DA2Network(const char *network_path, const char *input_layer_name, const char *output_layer_name)
@@ -192,7 +200,7 @@ public:
   int run_network(cv::Mat &dst, const cv::Size &output_size)
   {
 
-    if (this->height_ == 1 || this->width_ == 1)
+    if (this->height_ <= 0 || this->width_ <= 0)
     {
       std::cout << "Input tensor not set up, Terminating" << std::endl;
       exit(-1);
@@ -213,7 +221,7 @@ public:
 
     // get the output data
     const float *tensorData = outputTensor[0].GetTensorData<float>();
-    static cv::Mat tmp(out_height_, out_width_, CV_8UC1); // might as well re-use it if possible
+    cv::Mat tmp(out_height_, out_width_, CV_8UC1);
 
     // get the min and max of the output tensor and copy to a temporary cv::Mat
     float max = -1e+6;
@@ -225,6 +233,13 @@ public:
       max = value > max ? value : max;
     }
 
+    if (max <= min)
+    {
+      tmp.setTo(0);
+      cv::resize(tmp, dst, output_size);
+      return (0);
+    }
+
     // copy the normalized data over to a temporary cv::Mat
     // note that there is a little bit of a shift of the depth data to the right
     for (int i = 0, k = 0; i < out_height_; i++)
@@ -233,7 +248,7 @@ public:
       for (int j = 0; j < out_width_; j++, k++)
       {
         float value = 255 * (tensorData[k] - min) / (max - min);
-        ptr[j] = value > 255.0 ? (unsigned char)255 : (unsigned char)value;
+        ptr[j] = cv::saturate_cast<unsigned char>(value);
       }
     }
 
@@ -268,3 +283,5 @@ private:
   Ort::Value input_tensor_{nullptr};
   std::array<int64_t, 4> input_shape_{1, 3, height_, width_}; // batch, channel, height, width: 3-channel color image
 };
+
+#endif

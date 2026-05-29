@@ -42,6 +42,9 @@ public:
 #endif
     }
 
+    StyleNetwork(const StyleNetwork &) = delete;
+    StyleNetwork &operator=(const StyleNetwork &) = delete;
+
     ~StyleNetwork()
     {
         if (input_data != NULL)

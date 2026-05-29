@@ -8,6 +8,7 @@
 */
 
 #include "filter.h"
+#include <algorithm>
 #include <cmath>
 
 /* custom grayscale conversion.
@@ -386,7 +387,7 @@ int magnitude(cv::Mat &sx, cv::Mat &sy, cv::Mat &dst)
 */
 int blurQuantize(cv::Mat &src, cv::Mat &dst, int levels)
 {
-    if (src.empty() || levels <= 0)
+    if (src.empty() || levels <= 0 || levels > 255)
         return -1;
 
     // blur the image (reuse our fast separable blur)
@@ -483,8 +484,6 @@ int chromaticAberration(cv::Mat &src, cv::Mat &dst, int shift)
 
     return 0;
 }
-
-#include <vector> //for std::vector
 
 /* Sin City color isolation. keeps pixels close to targetHue (in HSV) in full
   color and the detected face regions in full color; everything else converts
